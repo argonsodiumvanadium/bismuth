@@ -442,11 +442,39 @@ func (self *Entity) GetCommon (args...*Entity) (res []*Entity) {
 		return
 	}
 	for _,l1 := range(self.Relations) {
-		for _,arg := range(args) {
-			if l1.Name == arg.Name && len(l1.Data) == len(arg.Data) {
-				res = append(res,l1)
+		for _,l2 := range(l1.Relations) {
+			for _,arg := range(args) {
+				if l2.Name == arg.Name && len(l2.Data) == len(arg.Data) {
+					res = append(res,l2)
+				}
 			}
 		}
 	}
 	return res
+}
+
+func (self *User) DeleteUser (u string) {
+	switch self.Access {
+	case ROOT:
+		*self.Session.Users[u] = User{}
+	default:
+		panic("only root user can delete users")
+	}
+}
+
+func (self *User) DeleteDatabase (db string) {
+	switch self.Access {
+	case ROOT:
+		*self.Databases[db] = Database{}
+	default:
+		panic("only root user can delete whole databases")
+	}
+}
+
+func (self *Database) DeleteTable (tableID string) {
+	*self.Tables[tableID] = Table{}
+}
+
+func (self *Table) DeleteEntity (name string) {
+	*self.Columns[name] = Entity{}
 }
